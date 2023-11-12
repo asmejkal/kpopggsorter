@@ -134,18 +134,25 @@ a:hover {
   }
 }
 
-.sorter > .col-4 > .box > .image {
-  max-height:100%;
-  max-width:100%;
-  margin: auto;
+.sorter.prelim.row {
+  display: none;
+}
+
+.character {
+	height: 500px;
+}
+
+.character > .image {
+  height:100%;
+  width:100%;
   cursor: pointer;
   border-radius: 10px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  object-fit: cover;
+  object-position: center;
 }
 
-.sorter > .col-4 > .box > .text {
+.sort.text {
   text-align: center;
   margin-top: 4px;
   color: #ffffff;
@@ -154,6 +161,7 @@ a:hover {
 .options {
   margin: 1em auto;
   text-align: left;
+  display: none;
 }
 
 label {

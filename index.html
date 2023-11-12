@@ -53,15 +53,33 @@
                             </div>
                         </div>
                     </div>
-    
-                    <div class="sorter row">
+					
+					<div class="sorter prelim row justify-content-md-center">
                         <div class="col-4">
-							<div class="box character">
-								<img class="left sort image" src="src/assets/default_card.jpg">
-								<div class="left sort text"><p></p></div>
+							<div class="box">
+								<div class="character">
+									<img class="prelim sort image" src="src/assets/default_card.jpg">
+								</div>
+								<div class="prelim sort text"><p></p></div>
 							</div>
 							
-							<div class="sorting left ignore button btn btn-outline-light btn-lg btn-block">Nugu</div>
+							<div style="display: flex">
+								<div class="prelim keep button btn btn-outline-light btn-lg btn-block" style="margin-right: 2px">Keep</div>
+								<div class="prelim ignore button btn btn-outline-light btn-lg btn-block" style="margin-top: 6px; margin-left: 2px;">Ignore</div>
+							</div>
+							<hr/>
+							<div class="prelim keep-group button btn btn-outline-light btn-lg btn-block">Keep Group</div>
+							<div class="prelim ignore-group button btn btn-outline-light btn-lg btn-block">Ignore Group</div>
+							<div class="prelim undo button btn btn-outline-light btn-lg btn-block">Undo</div>
+                        </div>
+                    </div>
+    
+                    <div class="sorter game row">
+                        <div class="col-4 box">
+							<div class="character">
+								<img class="left sort image" src="src/assets/default_card.jpg">
+							</div>
+							<div class="left sort text"><p></p></div>
                         </div>
     
                         <div class="col-4">
@@ -75,13 +93,11 @@
                             <div class="sorting save button btn btn-outline-light">Save Progress</div>
                         </div>
     
-                        <div class="col-4">
-							<div class="box character">
+                        <div class="col-4 box">
+							<div class="character">
 								<img class="right sort image" src="src/assets/default_card.jpg">
-								<div class="right sort text"><p></p></div>
 							</div>
-							
-							<div class="sorting right ignore button btn btn-outline-light btn-lg btn-block">Nugu</div>
+							<div class="right sort text"><p></p></div>
                         </div>
     
                     </div>

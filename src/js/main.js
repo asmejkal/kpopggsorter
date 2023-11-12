@@ -20,11 +20,12 @@ let timeError = false;    // Shifts entire savedata array to the right by 1 and 
 
 /** Intermediate sorter data. */
 let sortedIndexList = [];
+let prelimIgnoreList = [];
 let recordDataList  = [];
 let parentIndexList = [];
 let tiedDataList    = [];
-let ignoreList 		= [];
 
+let prelimIndex 	= 0;
 let leftIndex       = 0;
 let leftInnerIndex  = 0;
 let rightIndex      = 0;
@@ -58,17 +59,21 @@ let storedSaveType  = localStorage.getItem(`${sorterURL}_saveType`);
 function init() {
 
   /** Define button behavior. */
-  document.querySelector('.starting.start.button').addEventListener('click', start);
+  document.querySelector('.starting.start.button').addEventListener('click', prelimStart);
   document.querySelector('.starting.load.button').addEventListener('click', loadProgress);
 
   document.querySelector('.left.sort.image').addEventListener('click', () => pick('left'));
   document.querySelector('.right.sort.image').addEventListener('click', () => pick('right'));
+  
+  document.querySelector('.prelim.keep.button').addEventListener('click', () => prelimPick('keep'));
+  document.querySelector('.prelim.ignore.button').addEventListener('click', () => prelimPick('ignore'));
+  document.querySelector('.prelim.keep-group.button').addEventListener('click', () => prelimPick('keep-group'));
+  document.querySelector('.prelim.ignore-group.button').addEventListener('click', () => prelimPick('ignore-group'));
+  document.querySelector('.prelim.undo.button').addEventListener('click', prelimUndo);
 
   document.querySelector('.sorting.tie.button').addEventListener('click', () => pick('tie'));
   document.querySelector('.sorting.undo.button').addEventListener('click', undo);
   document.querySelector('.sorting.save.button').addEventListener('click', () => saveProgress('Progress'));
-  document.querySelector('.sorting.left.ignore.button').addEventListener('click', () => ignore('left'));
-  document.querySelector('.sorting.right.ignore.button').addEventListener('click', () => ignore('right'));
 
   document.querySelector('.finished.save.button').addEventListener('click', () => saveProgress('Last Result'));
   document.querySelector('.finished.getimg.button').addEventListener('click', generateImage);
@@ -100,7 +105,7 @@ function init() {
       }
     } else { // If sorting hasn't started yet.
       switch(ev.key) {
-        case '1': case 's': case 'Enter': start(); break;
+        case '1': case 's': case 'Enter': prelimStart(); break;
         case '2': case 'l':               loadProgress(); break;
         default: break;
       }
@@ -138,8 +143,8 @@ function init() {
   if (window.location.search.slice(1) !== '') decodeQuery();
 }
 
-/** Begin sorting. */
-function start() {
+/** Begin preliminary round. */
+function prelimStart() {
   /** Copy data into sorting array to filter. */
   characterDataToSort = characterData.slice(0);
 
@@ -197,6 +202,31 @@ function start() {
     }
   });
 
+  if (characterDataToSort.length < 2) {
+    alert('Cannot sort with less than two characters. Please reselect.');
+    return;
+  }
+
+  /** Disable all checkboxes and hide/show appropriate parts while we preload the images. */
+  document.querySelectorAll('input[type=checkbox]').forEach(cb => cb.disabled = true);
+  document.querySelectorAll('.starting.button').forEach(el => el.style.display = 'none');
+  document.querySelector('.loading.button').style.display = 'block';
+  document.querySelector('.progress-section').style.display = 'block';
+  loading = true;
+
+  preloadImages().then(() => {
+    loading = false;
+    document.querySelector('.loading.button').style.display = 'none';
+	document.querySelector('.sorter.game').style.display = 'none';
+	document.querySelector('.sorter.prelim').style.display = 'flex';
+    displayPrelim();
+  });
+}
+
+/** Begin sorting. */
+function start() {
+  prelimIgnoreList.reverse().forEach((x) => characterDataToSort.splice(x, 1));
+  
   if (characterDataToSort.length < 2) {
     alert('Cannot sort with less than two characters. Please reselect.');
     return;
@@ -260,21 +290,31 @@ function start() {
 
   leftInnerIndex  = 0;                        // Inner indexes, because we'll be comparing the left array
   rightInnerIndex = 0;                        // to the right array, in order to merge them into one sorted array.
+  
+  document.querySelector('.sorter.game').style.display = 'flex';
+  document.querySelector('.sorter.prelim').style.display = 'none';
+	
+  document.querySelectorAll('.sorting.button').forEach(el => el.style.display = 'block');
+  document.querySelectorAll('.sort.text').forEach(el => el.style.display = 'block');
+  display();
+}
 
-  /** Disable all checkboxes and hide/show appropriate parts while we preload the images. */
-  document.querySelectorAll('input[type=checkbox]').forEach(cb => cb.disabled = true);
-  document.querySelectorAll('.starting.button').forEach(el => el.style.display = 'none');
-  document.querySelector('.loading.button').style.display = 'block';
-  document.querySelector('.progress-section').style.display = 'block';
-  loading = true;
+/** Displays the current state of the preliminary sorter. */
+function displayPrelim() {
+  const percent   = Math.floor(prelimIndex * 100 / characterDataToSort.length);
+  const character = characterDataToSort[prelimIndex]; 
+    
+  const charNameDisp = name => {
+    const charName = reduceTextWidth(name, 'Arial 12.8px', 220);
+    const charTooltip = name !== charName ? name : '';
+    return `<p title="${charTooltip}">${charName}</p>`;
+  };
 
-  preloadImages().then(() => {
-    loading = false;
-    document.querySelector('.loading.button').style.display = 'none';
-    document.querySelectorAll('.sorting.button').forEach(el => el.style.display = 'block');
-    document.querySelectorAll('.sort.text').forEach(el => el.style.display = 'block');
-    display();
-  });
+  progressBar(`Preliminary No. ${prelimIndex + 1}`, percent);
+
+  document.querySelector('.prelim.sort.image').src = character.img;
+
+  document.querySelector('.prelim.sort.text').innerHTML = charNameDisp(character.name);
 }
 
 /** Displays the current state of the sorter. */
@@ -285,21 +325,6 @@ function display() {
   const leftChar        = characterDataToSort[leftCharIndex];
   const rightChar       = characterDataToSort[rightCharIndex];
   
-  const leftCharIgnored = ignoreList.includes(leftChar.name);
-  const rightCharIgnored = ignoreList.includes(rightChar.name);
-  if (leftCharIgnored && rightCharIgnored) {
-	  pick('tie');
-	  return;
-  }
-  else if (leftCharIgnored) {
-	  pick('right');
-	  return;
-  }
-  else if (rightCharIgnored) {
-	  pick('left');
-	  return;
-  }
-
   const charNameDisp = name => {
     const charName = reduceTextWidth(name, 'Arial 12.8px', 220);
     const charTooltip = name !== charName ? name : '';
@@ -328,28 +353,35 @@ function display() {
 }
 
 /**
- * Ignore character.
+ * Sort between two character choices or tie.
  *
- * @param {'left'|'right'} ignoreType
+ * @param {'keep'|'ignore'} prelimPickType
  */
-function ignore(ignoreType) {
-  const leftCharIndex   = sortedIndexList[leftIndex][leftInnerIndex];
-  const rightCharIndex  = sortedIndexList[rightIndex][rightInnerIndex];
-  const leftChar  = characterDataToSort[leftCharIndex];
-  const rightChar = characterDataToSort[rightCharIndex];
+function prelimPick(prelimPickType) {
+	const group = characterDataToSort[prelimIndex].opts.group[0];
 	
-  switch (ignoreType) {
-    case 'left': {
-      ignoreList.push(leftChar.name);
-	  pick('right');
-      break;
-    }
-    case 'right': {
-      ignoreList.push(rightChar.name);
-	  pick('left');
-      break;
-    }
-  }
+	if (prelimPickType === 'ignore' || prelimPickType === 'ignore-group') {
+		prelimIgnoreList.push(prelimIndex);
+	}
+	
+	prelimIndex++;
+	if (prelimIndex === characterDataToSort.length) {
+		start();
+		return;
+	}
+	
+	if (characterDataToSort[prelimIndex].opts.group[0] === group) {
+		if (prelimPickType === 'ignore-group') {
+			prelimPick('ignore-group');
+			return;
+		}
+		else if (prelimPickType === 'keep-group') {
+			prelimPick('keep-group');
+			return;
+		}
+	}
+	
+	displayPrelim();
 }
 
 /**
@@ -582,7 +614,7 @@ function result(imageNum = 3) {
   document.querySelectorAll('.sorting.button').forEach(el => el.style.display = 'none');
   document.querySelectorAll('.sort.text').forEach(el => el.style.display = 'none');
     document.querySelector('.progress-section').style.display = 'none';
-    document.querySelector('.sorter').style.display = 'none';
+    document.querySelector('.sorter.game').style.display = 'none';
   document.querySelector('.options').style.display = 'none';
   // document.querySelector('.info').style.display = 'none';
 
@@ -631,6 +663,20 @@ function result(imageNum = 3) {
       }
     }
   });
+}
+
+/** Undo previous choice in prelim. */
+function prelimUndo() {
+  if (prelimIndex <= 0) {
+	  return;
+  }	
+	
+  prelimIndex--;
+  if (prelimIgnoreList.length > 0 && prelimIgnoreList[prelimIgnoreList.length - 1] === prelimIndex) {
+	  prelimIgnoreList.pop();
+  }
+
+  displayPrelim();
 }
 
 /** Undo previous choice. */

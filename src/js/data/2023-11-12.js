@@ -3,7 +3,7 @@ dataSet[dataSetVersion] = {};
 
 dataSet[dataSetVersion].options = [
   {
-    name: "Filter by Group (you can also ignore individul members during the game)",
+    name: "Filter by Group",
     key: "group",
     tooltip: "Check this to restrict to certain groups.",
     checked: false,
@@ -1950,18 +1950,6 @@ dataSet[dataSetVersion].characterData = [
     }
   },
   {
-    name: "Sohee (Alice)",
-    img: "F3iReOX.png",
-    opts: {
-      group: [
-        "alice"
-      ],
-      gen: [
-        "gen3"
-      ]
-    }
-  },
-  {
     name: "Yoojung (Soloist)",
     img: "kBJUf37.png",
     opts: {
@@ -3152,6 +3140,18 @@ dataSet[dataSetVersion].characterData = [
   {
     name: "Yeonje (Alice)",
     img: "6NGM9lw.jpg",
+    opts: {
+      group: [
+        "alice"
+      ],
+      gen: [
+        "gen3"
+      ]
+    }
+  },
+  {
+    name: "Sohee (Alice)",
+    img: "F3iReOX.png",
     opts: {
       group: [
         "alice"
