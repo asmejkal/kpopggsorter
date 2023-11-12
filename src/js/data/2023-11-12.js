@@ -3,7 +3,7 @@ dataSet[dataSetVersion] = {};
 
 dataSet[dataSetVersion].options = [
   {
-    name: "Filter by Group",
+    name: "Filter by Group (you can also ignore individul members during the game)",
     key: "group",
     tooltip: "Check this to restrict to certain groups.",
     checked: false,
