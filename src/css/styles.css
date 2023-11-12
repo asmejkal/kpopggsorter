@@ -134,7 +134,7 @@ a:hover {
   }
 }
 
-.sorter > .col-4 > .image {
+.sorter > .col-4 > .box > .image {
   max-height:100%;
   max-width:100%;
   margin: auto;
@@ -145,7 +145,7 @@ a:hover {
   justify-content: center;
 }
 
-.sorter > .col-4 > .text {
+.sorter > .col-4 > .box > .text {
   text-align: center;
   margin-top: 4px;
   color: #ffffff;
@@ -154,6 +154,7 @@ a:hover {
 .options {
   margin: 1em auto;
   text-align: left;
+  display: none;
 }
 
 label {

@@ -23,6 +23,7 @@ let sortedIndexList = [];
 let recordDataList  = [];
 let parentIndexList = [];
 let tiedDataList    = [];
+let ignoreList 		= [];
 
 let leftIndex       = 0;
 let leftInnerIndex  = 0;
@@ -66,6 +67,8 @@ function init() {
   document.querySelector('.sorting.tie.button').addEventListener('click', () => pick('tie'));
   document.querySelector('.sorting.undo.button').addEventListener('click', undo);
   document.querySelector('.sorting.save.button').addEventListener('click', () => saveProgress('Progress'));
+  document.querySelector('.sorting.left.ignore.button').addEventListener('click', () => ignore('left'));
+  document.querySelector('.sorting.right.ignore.button').addEventListener('click', () => ignore('right'));
 
   document.querySelector('.finished.save.button').addEventListener('click', () => saveProgress('Last Result'));
   document.querySelector('.finished.getimg.button').addEventListener('click', generateImage);
@@ -281,6 +284,21 @@ function display() {
   const rightCharIndex  = sortedIndexList[rightIndex][rightInnerIndex];
   const leftChar        = characterDataToSort[leftCharIndex];
   const rightChar       = characterDataToSort[rightCharIndex];
+  
+  const leftCharIgnored = ignoreList.includes(leftChar.name);
+  const rightCharIgnored = ignoreList.includes(rightChar.name);
+  if (leftCharIgnored && rightCharIgnored) {
+	  pick('tie');
+	  return;
+  }
+  else if (leftCharIgnored) {
+	  pick('right');
+	  return;
+  }
+  else if (rightCharIgnored) {
+	  pick('left');
+	  return;
+  }
 
   const charNameDisp = name => {
     const charName = reduceTextWidth(name, 'Arial 12.8px', 220);
@@ -307,6 +325,31 @@ function display() {
       default: break;
     }
   } else { saveProgress('Autosave'); }
+}
+
+/**
+ * Ignore character.
+ *
+ * @param {'left'|'right'} ignoreType
+ */
+function ignore(ignoreType) {
+  const leftCharIndex   = sortedIndexList[leftIndex][leftInnerIndex];
+  const rightCharIndex  = sortedIndexList[rightIndex][rightInnerIndex];
+  const leftChar  = characterDataToSort[leftCharIndex];
+  const rightChar = characterDataToSort[rightCharIndex];
+	
+  switch (ignoreType) {
+    case 'left': {
+      ignoreList.push(leftChar.name);
+	  pick('right');
+      break;
+    }
+    case 'right': {
+      ignoreList.push(rightChar.name);
+	  pick('left');
+      break;
+    }
+  }
 }
 
 /**
