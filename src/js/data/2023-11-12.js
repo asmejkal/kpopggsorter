@@ -3163,7 +3163,7 @@ dataSet[dataSetVersion].characterData = [
   },
   {
     name: "Soyeon (Laboum)",
-    img: "I2Az6yt.jpg",
+    img: "4AeQbtE.jpg",
     opts: {
       group: [
         "laboum"

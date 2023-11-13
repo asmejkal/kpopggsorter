@@ -25,6 +25,7 @@ let recordDataList  = [];
 let parentIndexList = [];
 let tiedDataList    = [];
 
+let prelim 			= false;
 let prelimIndex 	= 0;
 let leftIndex       = 0;
 let leftInnerIndex  = 0;
@@ -84,8 +85,17 @@ function init() {
 
   /** Define keyboard controls (up/down/left/right vimlike k/j/h/l). */
   document.addEventListener('keypress', (ev) => {
-    /** If sorting is in progress. */
-    if (timestamp && !timeTaken && !loading && choices.length === battleNo - 1) {
+    /** If preliminary is in progress. */
+	if (prelim) {
+		switch(ev.key) {
+        case 'h': case 'ArrowLeft':           pickPrelim('keep'); break;
+        case 'l': case 'ArrowRight':          pickPrelim('ignore'); break;
+        case 'j': case '2': case 'ArrowDown': undo(); break;
+        default: break;
+      }
+	}
+	/** If sorting is in progress. */
+    else if (timestamp && !timeTaken && !loading && choices.length === battleNo - 1) {
       switch(ev.key) {
         case 's': case '3':                   saveProgress('Progress'); break;
         case 'h': case 'ArrowLeft':           pick('left'); break;
@@ -216,6 +226,7 @@ function prelimStart() {
 
   preloadImages().then(() => {
     loading = false;
+	prelim = true;
     document.querySelector('.loading.button').style.display = 'none';
 	document.querySelector('.sorter.game').style.display = 'none';
 	document.querySelector('.sorter.prelim').style.display = 'flex';
@@ -225,7 +236,8 @@ function prelimStart() {
 
 /** Begin sorting. */
 function start() {
-  prelimIgnoreList.reverse().forEach((x) => characterDataToSort.splice(x, 1));
+  prelim = false;
+  prelimIgnoreList.sort((a,b) => a-b).reverse().forEach((x) => characterDataToSort.splice(x, 1));
   
   if (characterDataToSort.length < 2) {
     alert('Cannot sort with less than two characters. Please reselect.');
@@ -301,6 +313,11 @@ function start() {
 
 /** Displays the current state of the preliminary sorter. */
 function displayPrelim() {
+  if (prelimIndex === characterDataToSort.length) {
+    start();
+	return;
+  }
+	
   const percent   = Math.floor(prelimIndex * 100 / characterDataToSort.length);
   const character = characterDataToSort[prelimIndex]; 
     
@@ -315,6 +332,8 @@ function displayPrelim() {
   document.querySelector('.prelim.sort.image').src = character.img;
 
   document.querySelector('.prelim.sort.text').innerHTML = charNameDisp(character.name);
+  
+  saveProgress('Autosave');
 }
 
 /** Displays the current state of the sorter. */
@@ -365,12 +384,8 @@ function prelimPick(prelimPickType) {
 	}
 	
 	prelimIndex++;
-	if (prelimIndex === characterDataToSort.length) {
-		start();
-		return;
-	}
 	
-	if (characterDataToSort[prelimIndex].opts.group[0] === group) {
+	if (prelimIndex < characterDataToSort.length && characterDataToSort[prelimIndex].opts.group[0] === group) {
 		if (prelimPickType === 'ignore-group') {
 			prelimPick('ignore-group');
 			return;
@@ -777,7 +792,8 @@ function generateTextList() {
 }
 
 function generateSavedata() {
-  const saveData = `${timeError?'|':''}${timestamp}|${timeTaken}|${choices}|${optStr}${suboptStr}`;
+  const prelimIgnoreListString = prelimIgnoreList.join();
+  const saveData = `${timeError?'|':''}${timestamp}|${timeTaken}|${choices}|${prelimIndex}|${prelimIgnoreListString}|${optStr}${suboptStr}`;
   return LZString.compressToEncodedURIComponent(saveData);
 }
 
@@ -858,6 +874,9 @@ function decodeQuery(queryString = window.location.search.slice(1)) {
     timeTaken = Number(decoded.splice(0, 1)[0]);
     choices   = decoded.splice(0, 1)[0];
 
+	const prelimIndexDecoded = decoded.splice(0, 1)[0];
+	const prelimIgnoreListStringDecoded = decoded.splice(0, 1)[0];
+
     const optDecoded    = decoded.splice(0, 1)[0];
     const suboptDecoded = decoded.slice(0);
 
@@ -904,6 +923,9 @@ function decodeQuery(queryString = window.location.search.slice(1)) {
         suboptDecodedIndex = suboptDecodedIndex + optIsTrue ? 1 : 0;
       } else { document.getElementById(`cb-${opt.key}`).checked = optDecoded[index] === '1'; }
     });
+	
+    prelimIndex = Number(prelimIndexDecoded);
+    prelimIgnoreList = prelimIgnoreListStringDecoded.split(',').map(Number);;
 
     successfulLoad = true;
   } catch (err) {
@@ -911,7 +933,7 @@ function decodeQuery(queryString = window.location.search.slice(1)) {
     setLatestDataset(); // Restore to default function if loading link does not work.
   }
 
-  if (successfulLoad) { start(); }
+  if (successfulLoad) { prelimStart(); }
 }
 
 /**
