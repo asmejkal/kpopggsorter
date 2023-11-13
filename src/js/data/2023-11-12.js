@@ -2779,7 +2779,7 @@ dataSet[dataSetVersion].characterData = [
   },
   {
     name: "Songsun (TRI.BE)",
-    img: "YE8duem.jpg",
+    img: "Ez0rd44.png",
     opts: {
       group: [
         "tribe"
