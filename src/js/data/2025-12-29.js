@@ -516,6 +516,69 @@ dataSet[dataSetVersion].characterData = [
     }
   },
   {
+    "name": "Billlie - Haram",
+    "img": "Billlie - Haram.webp",
+    "opts": {
+      "group": [
+        "billlie"
+      ]
+    }
+  },
+  {
+    "name": "Billlie - Haruna",
+    "img": "Billlie - Haruna.webp",
+    "opts": {
+      "group": [
+        "billlie"
+      ]
+    }
+  },
+  {
+    "name": "Billlie - Moon Sua",
+    "img": "Billlie - Moon Sua.webp",
+    "opts": {
+      "group": [
+        "billlie"
+      ]
+    }
+  },
+  {
+    "name": "Billlie - Sheon",
+    "img": "Billlie - Sheon.webp",
+    "opts": {
+      "group": [
+        "billlie"
+      ]
+    }
+  },
+  {
+    "name": "Billlie - Siyoon",
+    "img": "Billlie - Siyoon.webp",
+    "opts": {
+      "group": [
+        "billlie"
+      ]
+    }
+  },
+  {
+    "name": "Billlie - Suhyeon",
+    "img": "Billlie - Suhyeon.webp",
+    "opts": {
+      "group": [
+        "billlie"
+      ]
+    }
+  },
+  {
+    "name": "Billlie - Tsuki",
+    "img": "Billlie - Tsuki.webp",
+    "opts": {
+      "group": [
+        "billlie"
+      ]
+    }
+  },
+  {
     "name": "CLC - Elkie",
     "img": "CLC - Elkie.jpeg",
     "opts": {
@@ -1758,6 +1821,60 @@ dataSet[dataSetVersion].characterData = [
     }
   },
   {
+    "name": "LIGHTSUM - Chowon",
+    "img": "LIGHTSUM - Chowon.jpg",
+    "opts": {
+      "group": [
+        "lightsum"
+      ]
+    }
+  },
+  {
+    "name": "LIGHTSUM - Hina",
+    "img": "LIGHTSUM - Hina.jpg",
+    "opts": {
+      "group": [
+        "lightsum"
+      ]
+    }
+  },
+  {
+    "name": "LIGHTSUM - Juhyeon",
+    "img": "LIGHTSUM - Juhyeon.jpg",
+    "opts": {
+      "group": [
+        "lightsum"
+      ]
+    }
+  },
+  {
+    "name": "LIGHTSUM - Nayoung",
+    "img": "LIGHTSUM - Nayoung.jpg",
+    "opts": {
+      "group": [
+        "lightsum"
+      ]
+    }
+  },
+  {
+    "name": "LIGHTSUM - Sangah",
+    "img": "LIGHTSUM - Sangah.jpg",
+    "opts": {
+      "group": [
+        "lightsum"
+      ]
+    }
+  },
+  {
+    "name": "LIGHTSUM - Yujeong",
+    "img": "LIGHTSUM - Yujeong.jpg",
+    "opts": {
+      "group": [
+        "lightsum"
+      ]
+    }
+  },
+  {
     "name": "Loossemble - Gowon",
     "img": "Loossemble - Gowon.jpeg",
     "opts": {
@@ -1799,6 +1916,42 @@ dataSet[dataSetVersion].characterData = [
     "opts": {
       "group": [
         "loossemble"
+      ]
+    }
+  },
+  {
+    "name": "MAMAMOO - Hwasa",
+    "img": "MAMAMOO - Hwasa.jpg",
+    "opts": {
+      "group": [
+        "mamamoo"
+      ]
+    }
+  },
+  {
+    "name": "MAMAMOO - Moonbyul",
+    "img": "MAMAMOO - Moonbyul.jpg",
+    "opts": {
+      "group": [
+        "mamamoo"
+      ]
+    }
+  },
+  {
+    "name": "MAMAMOO - Solar",
+    "img": "MAMAMOO - Solar.jpg",
+    "opts": {
+      "group": [
+        "mamamoo"
+      ]
+    }
+  },
+  {
+    "name": "MAMAMOO - Wheein",
+    "img": "MAMAMOO - Wheein.jpg",
+    "opts": {
+      "group": [
+        "mamamoo"
       ]
     }
   },
@@ -2033,6 +2186,51 @@ dataSet[dataSetVersion].characterData = [
     "opts": {
       "group": [
         "purple kiss"
+      ]
+    }
+  },
+  {
+    "name": "RESCENE - Liv",
+    "img": "RESCENE - Liv.jpg",
+    "opts": {
+      "group": [
+        "rescene"
+      ]
+    }
+  },
+  {
+    "name": "RESCENE - May",
+    "img": "RESCENE - May.jpg",
+    "opts": {
+      "group": [
+        "rescene"
+      ]
+    }
+  },
+  {
+    "name": "RESCENE - Minami",
+    "img": "RESCENE - Minami.jpg",
+    "opts": {
+      "group": [
+        "rescene"
+      ]
+    }
+  },
+  {
+    "name": "RESCENE - Woni",
+    "img": "RESCENE - Woni.jpg",
+    "opts": {
+      "group": [
+        "rescene"
+      ]
+    }
+  },
+  {
+    "name": "RESCENE - Zena",
+    "img": "RESCENE - Zena.jpg",
+    "opts": {
+      "group": [
+        "rescene"
       ]
     }
   },
@@ -2363,6 +2561,15 @@ dataSet[dataSetVersion].characterData = [
   {
     "name": "Soloist - Ryu Sera",
     "img": "Soloist - Ryu Sera.jpeg",
+    "opts": {
+      "group": [
+        "soloist"
+      ]
+    }
+  },
+  {
+    "name": "Soloist - Ryu Sujeong",
+    "img": "Soloist - Ryu Sujeong.png",
     "opts": {
       "group": [
         "soloist"
