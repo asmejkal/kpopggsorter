@@ -2613,6 +2613,15 @@ dataSet[dataSetVersion].characterData = [
     }
   },
   {
+    "name": "Soloist - Yein",
+    "img": "Soloist - Yein.webp",
+    "opts": {
+      "group": [
+        "soloist"
+      ]
+    }
+  },
+  {
     "name": "Soloist - Yena",
     "img": "Soloist - Yena.jpeg",
     "opts": {
