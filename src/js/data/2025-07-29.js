@@ -10,6 +10,7 @@ dataSet[dataSetVersion].options = [
     sub: [
       { name: "aespa", key: "aespa" },
 	  { name: "ALLDAY PROJECT", key: "ADP" },	 
+    { name: "Apink", key: "Apink" },	  
 	  { name: "ARTMS", key: "ARTMS" },	  
       { name: "BABYMONSTER", key: "BABYMONSTER" },
       { name: "Baby DONT Cry", key: "bdc" },
@@ -112,6 +113,31 @@ dataSet[dataSetVersion].characterData = [
     name: "Winter (aespa)",
     img: "https://pub-d241d32de5134ba190733bade029bd7e.r2.dev/Winter.jpeg",
     group: [ "aespa" ]
+  },
+  {
+    name: "Bomi (Apink)",
+    img: "https://kpopsorter.dusty.link/Apink - Bomi.jpeg",
+    group: [ "Apink" ]
+  },
+  {
+    name: "Eunji (Apink)",
+    img: "https://kpopsorter.dusty.link/Apink - Eunji.jpeg",
+    group: [ "Apink" ]
+  },
+  {
+    name: "Hayoung (Apink)",
+    img: "https://kpopsorter.dusty.link/Apink - Hayoung.jpeg",
+    group: [ "Apink" ]
+  },
+  {
+    name: "Chorong (Apink)",
+    img: "https://kpopsorter.dusty.link/Apink - Chorong.jpeg",
+    group: [ "Apink" ]
+  },
+  {
+    name: "Naeun (Apink)",
+    img: "https://kpopsorter.dusty.link/Apink - Naeun.jpeg",
+    group: [ "Apink" ]
   },
   {
     name: "Choerry (ARTMS)",
@@ -835,22 +861,22 @@ dataSet[dataSetVersion].characterData = [
   },
   {
     name: "Hello (Kandis)",
-    img: "https://kpopsorter.dusty.link/Kandis - Hello.jpg",
+    img: "https://kpopsorter.dusty.link/Kandis - Hello.jpeg",
     group: [ "Kandis" ]
   },
   {
     name: "Looky (Kandis)",
-    img: "https://kpopsorter.dusty.link/Kandis - Looky.jpg",
+    img: "https://kpopsorter.dusty.link/Kandis - Looky.jpeg",
     group: [ "Kandis" ]
   },
   {
     name: "Nine (Kandis)",
-    img: "https://kpopsorter.dusty.link/Kandis - Nine.jpg",
+    img: "https://kpopsorter.dusty.link/Kandis - Nine.jpeg",
     group: [ "Kandis" ]
   },
   {
     name: "Venny (Kandis)",
-    img: "https://kpopsorter.dusty.link/Kandis - Venny.jpg",
+    img: "https://kpopsorter.dusty.link/Kandis - Venny.jpeg",
     group: [ "Kandis" ]
   },
   {
