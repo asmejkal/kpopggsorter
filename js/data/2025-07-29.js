@@ -1921,12 +1921,12 @@ dataSet[dataSetVersion].characterData = [
   },
   {
     name: "Yeonjung (WJSN)",
-    img: "https://pub-d241d32de5134ba190733bade029bd7e.r2.dev/YeonjungWJSN.jpg",
+    img: "https://pub-d241d32de5134ba190733bade029bd7e.r2.dev/Soobin.jpg",
     group: [ "WJSN" ]
   },
   {
     name: "Soobin (WJSN)",
-    img: "https://pub-d241d32de5134ba190733bade029bd7e.r2.dev/Soobin.jpg",
+    img: "https://pub-d241d32de5134ba190733bade029bd7e.r2.dev/YeonjungWJSN.jpg",
     group: [ "WJSN" ]
   },
   {
