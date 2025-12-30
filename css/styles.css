@@ -1,6 +1,6 @@
 body {
   font-family: 'Montserrat', Helvetica, sans-serif;
-  background-color: #21010f;
+  background-color: #7a2875;
   color: #ffffff;
 }
 
@@ -10,6 +10,18 @@ a {
 
 a:hover {
   color: #B36F75;
+}
+
+ul {
+  list-style-type: disc;
+}
+
+h2 {
+  font-size: 200%;
+}
+
+h3 {
+  font-size: 130%;
 }
 
 .title {
@@ -26,7 +38,7 @@ a:hover {
   padding: 10px;
   border-radius: 15px;
   box-shadow: 0px 3px 8px 0px rgba(0,0,0,0.35);
-  background-color: #21010f;
+  background-color: #7a2875;
   border: 2px solid #ffffff;
 }
 
@@ -39,12 +51,12 @@ a:hover {
   display: none;
   color: #ffffff;
   text-align: center;
-  background-color: #21010f;
+  background-color: #7a2875;
 }
 
 .progressbar {
   position: relative;
-  border: 1px solid #111111;
+  border: 1px solid #FFBCD9;
   border-radius: 20px;
   padding: 3px;
   margin: 2px 0px;
@@ -52,10 +64,13 @@ a:hover {
 
 .progresstext {
   position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 100%;
-  margin: 3px 0px;
   text-align: center;
   font-size: 0.7em;
+  z-index: 1;
 }
 
 .progressfill {
@@ -63,6 +78,9 @@ a:hover {
   background-color: #FFBCD9;
   border-radius: 10px;
   width: 0%;
+  position: relative;
+  /* Add this to ensure .progresstext is above the fill */
+  z-index: 0;
 }
 
 .button {
@@ -134,25 +152,20 @@ a:hover {
   }
 }
 
-.sorter.prelim.row {
-  display: none;
-}
-
-.character {
-	height: 500px;
-}
-
-.character > .image {
-  height:100%;
-  width:100%;
+.sorter > .col-4 > .image {
+  max-height:100%;
+  max-width:100%;
+  margin: auto;
   cursor: pointer;
   border-radius: 10px;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 97%;
   object-fit: cover;
-  object-position: center;
 }
 
-.sort.text {
+.sorter > .col-4 > .text {
   text-align: center;
   margin-top: 4px;
   color: #ffffff;
@@ -161,7 +174,6 @@ a:hover {
 .options {
   margin: 1em auto;
   text-align: left;
-  display: none;
 }
 
 label {
@@ -169,7 +181,20 @@ label {
 }
 
 label:hover {
-  color: #B36F75;
+  color: #000000;
+}
+
+.button-container {
+  margin-bottom: 5px;
+  overflow: hidden;
+}
+
+.button-container button {
+  text-decoration: dashed;
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+  margin-right: 2px;
 }
 
 .options > .large.option, .options > hr {
