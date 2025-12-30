@@ -116,27 +116,27 @@ dataSet[dataSetVersion].characterData = [
   },
   {
     name: "Bomi (Apink)",
-    img: "https://kpopsorter.dusty.link/Apink - Bomi.jpeg",
+    img: "https://kpopsorter.dusty.link/images/Apink - Bomi.jpeg",
     group: [ "Apink" ]
   },
   {
     name: "Eunji (Apink)",
-    img: "https://kpopsorter.dusty.link/Apink - Eunji.jpeg",
+    img: "https://kpopsorter.dusty.link/images/Apink - Eunji.jpeg",
     group: [ "Apink" ]
   },
   {
     name: "Hayoung (Apink)",
-    img: "https://kpopsorter.dusty.link/Apink - Hayoung.jpeg",
+    img: "https://kpopsorter.dusty.link/images/Apink - Hayoung.jpeg",
     group: [ "Apink" ]
   },
   {
     name: "Chorong (Apink)",
-    img: "https://kpopsorter.dusty.link/Apink - Chorong.jpeg",
+    img: "https://kpopsorter.dusty.link/images/Apink - Chorong.jpeg",
     group: [ "Apink" ]
   },
   {
     name: "Naeun (Apink)",
-    img: "https://kpopsorter.dusty.link/Apink - Naeun.jpeg",
+    img: "https://kpopsorter.dusty.link/images/Apink - Naeun.jpeg",
     group: [ "Apink" ]
   },
   {
@@ -466,27 +466,27 @@ dataSet[dataSetVersion].characterData = [
   },
   {
     name: "Athena (FIFTY FIFTY)",
-    img: "https://kpopsorter.dusty.link/FIFTY FIFTY - Athena.jpeg",
+    img: "https://kpopsorter.dusty.link/images/FIFTY FIFTY - Athena.jpeg",
     group: [ "FIFTY FIFTY" ]
   },
   {
     name: "Hana (FIFTY FIFTY)",
-    img: "https://kpopsorter.dusty.link/FIFTY FIFTY - Hana.jpeg",
+    img: "https://kpopsorter.dusty.link/images/FIFTY FIFTY - Hana.jpeg",
     group: [ "FIFTY FIFTY" ]
   },
   {
     name: "Chanelle (FIFTY FIFTY)",
-    img: "https://kpopsorter.dusty.link/FIFTY FIFTY - Chanelle Moon.jpeg",
+    img: "https://kpopsorter.dusty.link/images/FIFTY FIFTY - Chanelle Moon.jpeg",
     group: [ "FIFTY FIFTY" ]
   },
   {
     name: "Keena (FIFTY FIFTY)",
-    img: "https://kpopsorter.dusty.link/FIFTY FIFTY - Keena.jpeg",
+    img: "https://kpopsorter.dusty.link/images/FIFTY FIFTY - Keena.jpeg",
     group: [ "FIFTY FIFTY" ]
   },
   {
     name: "Yewon (FIFTY FIFTY)",
-    img: "https://kpopsorter.dusty.link/FIFTY FIFTY - Yewon.jpeg",
+    img: "https://kpopsorter.dusty.link/images/FIFTY FIFTY - Yewon.jpeg",
     group: [ "FIFTY FIFTY" ]
   },
   {
@@ -531,27 +531,27 @@ dataSet[dataSetVersion].characterData = [
   },
   {
     name: "Andamiro (Geenius)",
-    img: "https://kpopsorter.dusty.link/Geenius - Andamiro.jpeg",
+    img: "https://kpopsorter.dusty.link/images/Geenius - Andamiro.jpeg",
     group: [ "Geenius" ]
   },
   {
     name: "Mika (Geenius)",
-    img: "https://kpopsorter.dusty.link/Geenius - Mika.jpeg",
+    img: "https://kpopsorter.dusty.link/images/Geenius - Mika.jpeg",
     group: [ "Geenius" ]
   },
   {
     name: "Sion (Geenius)",
-    img: "https://kpopsorter.dusty.link/Geenius - Sion.jpeg",
+    img: "https://kpopsorter.dusty.link/images/Geenius - Sion.jpeg",
     group: [ "Geenius" ]
   },
   {
     name: "Yeyoung (Geenius)",
-    img: "https://kpopsorter.dusty.link/Geenius - Yeyoung.jpeg",
+    img: "https://kpopsorter.dusty.link/images/Geenius - Yeyoung.jpeg",
     group: [ "Geenius" ]
   },
   {
     name: "Zoe (Geenius)",
-    img: "https://kpopsorter.dusty.link/Geenius - Zoe.jpeg",
+    img: "https://kpopsorter.dusty.link/images/Geenius - Zoe.jpeg",
     group: [ "Geenius" ]
   },
   {
@@ -861,22 +861,22 @@ dataSet[dataSetVersion].characterData = [
   },
   {
     name: "Hello (Kandis)",
-    img: "https://kpopsorter.dusty.link/Kandis - Hello.jpeg",
+    img: "https://kpopsorter.dusty.link/images/Kandis - Hello.jpeg",
     group: [ "Kandis" ]
   },
   {
     name: "Looky (Kandis)",
-    img: "https://kpopsorter.dusty.link/Kandis - Looky.jpeg",
+    img: "https://kpopsorter.dusty.link/images/Kandis - Looky.jpeg",
     group: [ "Kandis" ]
   },
   {
     name: "Nine (Kandis)",
-    img: "https://kpopsorter.dusty.link/Kandis - Nine.jpeg",
+    img: "https://kpopsorter.dusty.link/images/Kandis - Nine.jpeg",
     group: [ "Kandis" ]
   },
   {
     name: "Venny (Kandis)",
-    img: "https://kpopsorter.dusty.link/Kandis - Venny.jpeg",
+    img: "https://kpopsorter.dusty.link/images/Kandis - Venny.jpeg",
     group: [ "Kandis" ]
   },
   {
@@ -1021,32 +1021,32 @@ dataSet[dataSetVersion].characterData = [
   },
   {
     name: "Haein (LABOUM)",
-    img: "https://kpopsorter.dusty.link/LABOUM - Haein.jpeg",
+    img: "https://kpopsorter.dusty.link/images/LABOUM - Haein.jpeg",
     group: [ "LABOUM" ]
   },
   {
     name: "Jinyea (LABOUM)",
-    img: "https://kpopsorter.dusty.link/LABOUM - Jinyea.jpeg",
+    img: "https://kpopsorter.dusty.link/images/LABOUM - Jinyea.jpeg",
     group: [ "LABOUM" ]
   },
   {
     name: "Solbin (LABOUM)",
-    img: "https://kpopsorter.dusty.link/LABOUM - Solbin.jpeg",
+    img: "https://kpopsorter.dusty.link/images/LABOUM - Solbin.jpeg",
     group: [ "LABOUM" ]
   },
   {
     name: "Soyeon (LABOUM)",
-    img: "https://kpopsorter.dusty.link/LABOUM - Soyeon.jpeg",
+    img: "https://kpopsorter.dusty.link/images/LABOUM - Soyeon.jpeg",
     group: [ "LABOUM" ]
   },
   {
     name: "Yujeong (LABOUM)",
-    img: "https://kpopsorter.dusty.link/LABOUM - Yujeong.jpeg",
+    img: "https://kpopsorter.dusty.link/images/LABOUM - Yujeong.jpeg",
     group: [ "LABOUM" ]
   },
   {
     name: "Yulhee (LABOUM)",
-    img: "https://kpopsorter.dusty.link/LABOUM - Yulhee.jpeg",
+    img: "https://kpopsorter.dusty.link/images/LABOUM - Yulhee.jpeg",
     group: [ "LABOUM" ]
   },
   {
@@ -1166,27 +1166,27 @@ dataSet[dataSetVersion].characterData = [
   },
   {
     name: "Hwasa (MAMAMOO)",
-    img: "https://kpopsorter.dusty.link/MAMAMOO - Hwasa.jpg",
+    img: "https://kpopsorter.dusty.link/images/MAMAMOO - Hwasa.jpg",
     group: [ "MAMAMOO" ]
   },
   {
     name: "Solar (MAMAMOO)",
-    img: "https://kpopsorter.dusty.link/MAMAMOO - Solar.jpg",
+    img: "https://kpopsorter.dusty.link/images/MAMAMOO - Solar.jpg",
     group: [ "MAMAMOO" ]
   },
   {
     name: "Moonbyul (MAMAMOO)",
-    img: "https://kpopsorter.dusty.link/MAMAMOO - Moonbyul.jpg",
+    img: "https://kpopsorter.dusty.link/images/MAMAMOO - Moonbyul.jpg",
     group: [ "MAMAMOO" ]
   },
   {
     name: "Wheein (MAMAMOO)",
-    img: "https://kpopsorter.dusty.link/MAMAMOO - Wheein.jpg",
+    img: "https://kpopsorter.dusty.link/images/MAMAMOO - Wheein.jpg",
     group: [ "MAMAMOO" ]
   },
   {
     name: "Wheein (MAMAMOO)",
-    img: "https://kpopsorter.dusty.link/MAMAMOO - Wheein.jpg",
+    img: "https://kpopsorter.dusty.link/images/MAMAMOO - Wheein.jpg",
     group: [ "MAMAMOO" ]
   },
   {
