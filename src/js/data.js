@@ -1,6 +1,6 @@
 /**
  * @typedef {{name: string, key: string, tooltip?: string, checked?: boolean, sub?: {name: string, tooltip?: string, checked?: string}[]}[]} Options
- * @typedef {{name: string, img: string, opts: Object<string, boolean|number[]}[]} CharData
+ * @typedef {{name: string, img: string, group?: string[], opts?: Object<string, boolean|number[]>}} CharData
 */
 
 /**
@@ -20,4 +20,7 @@ let dataSetVersion = '';
 /**
  * Image root, will be appended to the start of every image URL.
  */
-const imageRoot = 'https://kpopsorter.dusty.link/images/';
+// Root path for idol images.
+// Images are served from a Cloudflare R2 bucket.
+// Public bucket URL: https://pub-d241d32de5134ba190733bade029bd7e.r2.dev/
+const imageRoot = 'https://pub-d241d32de5134ba190733bade029bd7e.r2.dev/';

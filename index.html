@@ -3,140 +3,207 @@
 
 <head>
   <meta charset="utf-8">
-  <link rel="shortcut icon" href="src/assets/1754178.ico" type="image/x-icon">
-  <link rel="icon" href="src/assets/1754178.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="content/1754178.ico" type="image/x-icon">
+  <link rel="icon" href="content/1754178.ico" type="image/x-icon">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta property="og:image:width" content="279">
   <meta property="og:image:height" content="279">
   <meta property="og:title" content="K-Pop GG Member Sorter">
   <meta property="og:site_name" content="K-Pop GG Member Sorter">
-  <meta property="og:description" content="A simple website for sorting K-Pop Girl Group members in a formatted list.">
-  <meta property="og:image" content="https://imgur.com/a/bikS7Db">
+  <meta property="og:description"
+    content="Sort your Kpop girl group biases via head-to-head matchups - Made by @leftypitcher on Discord">
+  <meta property="og:image" content="https://imgur.com/a/wgUg9sL">
   <title>K-Pop GG Member Sorter</title>
 
   <link href="https://fonts.googleapis.com/css?family=Montserrat:400,800" rel="stylesheet">
-  <link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" rel="stylesheet">
-  <link href="src/css/styles.css" rel="stylesheet" type="text/css">
-  <link rel="stylesheet" type="text/css" href="src/css/reset.css">
-  <link rel="stylesheet" type="text/css" href="src/css/styles.css">
+  <link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+    integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" rel="stylesheet">
+  <link href="css/styles.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" type="text/css" href="css/reset.css">
+  <link rel="stylesheet" type="text/css" href="css/styles.css">
 
-  <script src="src/js/data.js"></script>
-  <script src="src/js/data/2023-11-12.js"></script>
-  <script src="src/js/data/2025-12-29.js"></script>
-  <script src="src/js/html2canvas.min.js"></script>
-  <script src="src/js/lz-string.min.js"></script>
-  <script src="src/js/seedrandom.min.js"></script>
-  <script src="src/js/main.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/data/2025-07-29.js"></script>
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/lz-string.min.js"></script>
+  <script src="js/seedrandom.min.js"></script>
+  <script src="js/main.js"></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-64784129-2"></script>
   <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-64784129-2');
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'UA-64784129-2');
   </script>
-  
+
 </head>
 
 <body>
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="title">
-                    <p>K-Pop GG<br>Member Sorter</p>
-                </div>
-    
-                <div class="sort-body">
-                    <div class="row">
-                        <div class="progress-section col-12">
-                            <span class="progressbattle"></span>
-                            <div class="progressbar">
-                                <div class="progressfill"><span class="progresstext"></span></div>
-                            </div>
-                        </div>
-                    </div>
-					
-					<div class="sorter prelim row justify-content-md-center">
-                        <div class="col-4">
-							<div class="box">
-								<div class="character">
-									<img class="prelim sort image" src="src/assets/default_card.jpg">
-								</div>
-								<div class="prelim sort text"><p></p></div>
-							</div>
-							
-							<div style="display: flex">
-								<div class="prelim keep button btn btn-outline-light btn-lg btn-block" style="margin-right: 2px">Keep</div>
-								<div class="prelim ignore button btn btn-outline-light btn-lg btn-block" style="margin-top: 6px; margin-left: 2px;">Ignore</div>
-							</div>
-							<hr/>
-							<div class="prelim keep-group button btn btn-outline-light btn-lg btn-block">Keep Group</div>
-							<div class="prelim ignore-group button btn btn-outline-light btn-lg btn-block">Ignore Group</div>
-							<div class="prelim undo button btn btn-outline-light btn-lg btn-block">Undo</div>
-                        </div>
-                    </div>
-    
-                    <div class="sorter game row">
-                        <div class="col-4 box">
-							<div class="character">
-								<img class="left sort image" src="src/assets/default_card.jpg">
-							</div>
-							<div class="left sort text"><p></p></div>
-                        </div>
-    
-                        <div class="col-4">
-                            <div class="starting start button btn btn-outline-light btn-lg btn-block">Click to Start!</div>
-                            <div class="starting load button btn btn-outline-light">Load <span></span></div>
-    
-                            <div class="loading button btn btn-outline-light"><div></div><span>Loading...</span></div>
-    
-                            <div class="sorting tie button btn btn-outline-light">Tie</div>
-                            <div class="sorting undo button btn btn-outline-light">Undo</div>
-                            <div class="sorting save button btn btn-outline-light">Save Progress</div>
-                        </div>
-    
-                        <div class="col-4 box">
-							<div class="character">
-								<img class="right sort image" src="src/assets/default_card.jpg">
-							</div>
-							<div class="right sort text"><p></p></div>
-                        </div>
-    
-                    </div>
-    
-                    <div class="options"></div>
-                    <div class="result-options">
-                        <div class="time taken"></div>
-                        <div class="image selector">Display Images on Result: </div>
-                        <div class="finished save button btn btn-outline-light">Generate Result URL</div>
-                        <div class="finished getimg button btn btn-outline-light">Generate Image</div>
-                        <div class="finished list button btn btn-outline-light">Generate Text List</div>
-                        <hr>
-                    </div>
-                    </div>
-
-                    <div class="box col-12" id="new-results">
-                        <div class="result-title">My K-Pop GG Member Ranking</div>
-                        <div class="results row"></div>
-                        <div class="results results-table row"></div>
-                        <p class="result-footer">K-Pop GG Member Sorter by Rei based on design by Gru, modified from charasort by execfera.<br> Following the path of the Blue Cat <br/> WHO was in KWANGYA?.</p>
-                    </div>
-    
-                    </div>
-    
-                </div>
-                <div class="info">
-                    <h4>Keyboard Controls</h4>
-                    <p><span class="keyboard">Keyboard controls during sorting:</span> <br><span class="keyboard">H/LeftArrow</span> (pick left or keep) <br><span class="keyboard">J/DownArrow</span> (undo) <br><span class="keyboard">K/UpArrow</span> (tie) <br><span class="keyboard">L/RightArrow</span> (pick right or ignore) <br><span class="keyboard">S</span> (save progress).</p>
-                    <p><span class="keyboard">Before sorting: </span><br><span class="keyboard">S/Enter</span> (start sorting) <br><span class="keyboard">L</span> (load progress).</p>
-                    <p><span class="keyboard">1/2/3</span> always correspond to the first/second/third buttons.</p>
-    
-                    <br>
-                    <p class="result-footer"></p>
-                    <a href="#" class="clearsave" class="result-footer">Clear Save Data</a>
-                </div>
-            </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <div class="title">
+          <p>K-Pop GG<br>Member Sorter</p>
         </div>
+        <p style="color:yellow;font-size:25px;">Pics have been restored! </p>
+        <div class="sort-body">
+          <div class="row">
+            <div class="progress-section col-12">
+              <span class="progressbattle"></span>
+              <div class="progressbar">
+                <div class="progressfill"></div>
+                <span class="progresstext"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sorter row">
+            <div class="col-4 box">
+              <img class="left sort image" src="content/default_card.jpg">
+              <div class="left sort text">
+                <p></p>
+              </div>
+            </div>
+
+            <div class="col-4">
+              <div class="starting start button btn btn-outline-light btn-lg btn-block">Click to Start!</div>
+              <div class="starting load button btn btn-outline-light">Load <span></span></div>
+
+              <div class="loading button btn btn-outline-light">
+                <div></div><span>Loading...</span>
+              </div>
+
+              <div class="sorting tie button btn btn-outline-light">Tie</div>
+              <div class="sorting undo button btn btn-outline-light">Undo</div>
+              <div class="sorting save button btn btn-outline-light">Save Progress</div>
+            </div>
+
+            <div class="col-4 box">
+              <img class="right sort image" src="content/default_card2.jpg">
+              <div class="right sort text">
+                <p></p>
+              </div>
+            </div>
+
+          </div>
+          <div class="options">
+          </div>
+          <div class="result-options">
+            <div class="time taken"></div>
+            <div class="image selector">Display Images on Result: </div>
+            <div class="finished save button btn btn-outline-light">Generate Result URL</div>
+            <div class="finished getimg button btn btn-outline-light">Generate Image</div>
+            <div class="finished list button btn btn-outline-light">Generate Text List</div>
+            <hr>
+          </div>
+        </div>
+
+        <div class="box col-12" id="new-results">
+          <div class="result-title">My K-Pop GG Member Ranking</div>
+          <div class="results row"></div>
+          <div class="results results-table row"></div>
+          <p class="result-footer">
+          <p style="color:white">K-Pop GG Member Sorter by @leftypitcher on Discord. Contact for issues/concerns.</p>
+        </div>
+
+      </div>
+
     </div>
-</body>    
+    <h2><u> Changelog </u></h2><br>
+
+    <h3> <u> 2025-07-29</u> </h3>
+    <li> Restored and updated the deleted pics. These pics are hosted in a reliable system, rather than Imgur, so this
+      will never happen again. </li>
+    <li> Added HUNTR/X from Kpop Demon Hunters. My heroes.
+    <li> Removed Geenius. </li>
+    <li> Added Shuie to SAY MY NAME. </li>
+    <br>
+
+    <h3> <u> 2025-07-26</u> </h3>
+    <li> The Undo button now works for as many times as is needed, rather than just the previous matchup. </li>
+    <br>
+
+    <h3> <u> 2025-07-23</u> </h3>
+    <li> Fixed the save feature incorrectly reloading girls that were excluded. </li>
+    <br>
+
+    <h3> <u> 2025-07-21 - Big update!</u> </h3>
+    <li> Individual girls can be included/excluded via a checkbox under each group. Try it out! </li>
+    <li> Added Baby DONT Cry, ifeye, NiziU, XG, and KATSEYE. </li>
+    <li> Added Chungha and You Dayeon to soloists. </li>
+    <li> Removed the "Filter by Generation" option. </li>
+    <li> Background color change to commemorate a new era. </li>
+    <br>
+
+    <h3> <u> 2025-06-27 </u> </h3>
+    <li> Added QWER, ALLDAY PROJECT, KIIRAS, HITGS, and USPEER. </li>
+    <li> Added Yuju to soloists. </li>
+    <li> Changed (G)I-dle to i-dle. </li>
+    <li> Fixed capitalization of group names. </li>
+    <br>
+
+    <h3> <u> 2025-02-25 </u> </h3>
+    <li> Added Hearts2Hearts and KiiiKiii. </li>
+    <li> Added Hyewon and Nako (formerly IZ*One to soloists). </li>
+    <li> Removed hover. Was not really implemented well and caused issues for mobile. </li>
+    <li> Changed NewJeans to NJZ. </li>
+    <li> Picture update for IVE, aespa, and NJZ. </li>
+    <br>
+
+    <h3> <u> 2024-11-18 </u> </h3>
+    <li> Added Tri.be, Say My Name, and Odd Youth </li>
+    <li> Picture update </li>
+    <li> Added a nifty hover. Let me know if you like/dislike this </li>
+    <li> Fixed some issues with images being different sizes </li>
+    <li> Added Jinni/Yves to solos </li>
+    <li> Gahyeon --> Gahyun to reflect her new name </li>
+    <br>
+
+    <h3> <u> 2024-09-15 </u> </h3>
+    <li> Added Mimiirose </li>
+    <br>
+
+    <h3> <u> 2024-09-07 </u> </h3>
+    <li> Added Meovv </li>
+    <li> Changed background color. People didn't like green! </li>
+    <li> Made some formatting to be more mobile friendly </li>
+    <br>
+
+    <h3> <u> 2024-08-25 </u> </h3>
+    <ul>
+      <li> Added new groups: Everglow, Babymonster, CLASS:y, Candy Shop, RESCENE, UNIS, Izna, ICHILLIN', Madein
+        (Formerly Limelight) </li>
+      <li> Edited generations (fromis: 4 --> 3, tripleS: 4 --> 5, WJSN: 4 --> 3 </li>
+      <li> Moved Yeseo and Yeshiro: Kep1er --> Madein </li>
+      <li> Added Nayoung to Lightsum </li>
+      <li> Moved and renamed Belle: cignature --> Hyeonju (UNIS) </li>
+      <li> Fixed some capitalization styling (ITZY, aespa, fromis_9, IVE, WOOAH, LE SSERAFIM) </li>
+      <li> Added Check All/Uncheck All buttons </li>
+      <li> Initial launch
+    </ul>
+
+    <div class="info">
+      <h4>Keyboard Controls</h4>
+      <p><span class="keyboard">Keyboard controls during sorting:</span> <br><span class="keyboard">H/LeftArrow</span>
+        (pick left) <br><span class="keyboard">J/DownArrow</span> (undo) <br><span class="keyboard">K/UpArrow</span>
+        (tie) <br><span class="keyboard">L/RightArrow</span> (pick right) <br><span class="keyboard">S</span> (save
+        progress).</p>
+      <p><span class="keyboard">Before sorting: </span><br><span class="keyboard">S/Enter</span> (start sorting)
+        <br><span class="keyboard">L</span> (load progress).</p>
+      <p><span class="keyboard">1/2/3</span> always correspond to the first/second/third buttons.</p>
+
+      <br>
+      <p class="result-footer"></p>
+      <a href="#" class="clearsave" class="result-footer">Clear Save Data</a>
+    </div>
+  </div>
+  </div>
+  </div>
+  <!-- 100% privacy-first analytics -->
+  <script async defer src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+  <noscript><img src="https://queue.simpleanalyticscdn.com/noscript.gif" alt=""
+      referrerpolicy="no-referrer-when-downgrade" /></noscript>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"c46ed5a6dc3c482297270097d00c7dfd","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
 
 </html>

@@ -1,80 +1,68 @@
 /** @type {CharData} */
-let characterData       = [];   // Initial character data set used.
+let characterData = [];   // Initial character data set used.
 /** @type {CharData} */
 let characterDataToSort = [];   // Character data set after filtering.
 /** @type {Options} */
-let options             = [];   // Initial option set used.
+let options = [];   // Initial option set used.
 
-let currentVersion      = '';   // Which version of characterData and options are used.
+/** Mapping of group keys to member name arrays. */
+let memberMap = {};
+
+let currentVersion = '';   // Which version of characterData and options are used.
 
 /** @type {(boolean|boolean[])[]} */
-let optTaken  = [];             // Records which options are set.
+let optTaken = [];             // Records which options are set.
 
 /** Save Data. Concatenated into array, joined into string (delimited by '|') and compressed with lz-string. */
 let timestamp = 0;        // savedata[0]      (Unix time when sorter was started, used as initial PRNG seed and in dataset selection)
 let timeTaken = 0;        // savedata[1]      (Number of ms elapsed when sorter ends, used as end-of-sort flag and in filename generation)
-let choices   = '';       // savedata[2]      (String of '0', '1' and '2' that records what sorter choices are made)
-let optStr    = '';       // savedata[3]      (String of '0' and '1' that denotes top-level option selection)
+let choices = '';       // savedata[2]      (String of '0', '1' and '2' that records what sorter choices are made)
+let optStr = '';       // savedata[3]      (String of '0' and '1' that denotes top-level option selection)
 let suboptStr = '';       // savedata[4...n]  (String of '0' and '1' that denotes nested option selection, separated by '|')
+let memberStr = '';       // savedata[n...]  (String of '0' and '1' that denotes member selection, separated by '|')
 let timeError = false;    // Shifts entire savedata array to the right by 1 and adds an empty element at savedata[0] if true.
 
 /** Intermediate sorter data. */
 let sortedIndexList = [];
-let prelimIgnoreList = [];
-let recordDataList  = [];
+let recordDataList = [];
 let parentIndexList = [];
-let tiedDataList    = [];
+let tiedDataList = [];
 
-let prelim 			= false;
-let prelimIndex 	= 0;
-let leftIndex       = 0;
-let leftInnerIndex  = 0;
-let rightIndex      = 0;
+let leftIndex = 0;
+let leftInnerIndex = 0;
+let rightIndex = 0;
 let rightInnerIndex = 0;
-let battleNo        = 1;
-let sortedNo        = 0;
-let pointer         = 0;
+let battleNo = 1;
+let sortedNo = 0;
+let pointer = 0;
 
-/** A copy of intermediate sorter data is recorded for undo() purposes. */
-let sortedIndexListPrev = [];
-let recordDataListPrev  = [];
-let parentIndexListPrev = [];
-let tiedDataListPrev    = [];
-
-let leftIndexPrev       = 0;
-let leftInnerIndexPrev  = 0;
-let rightIndexPrev      = 0;
-let rightInnerIndexPrev = 0;
-let battleNoPrev        = 1;
-let sortedNoPrev        = 0;
-let pointerPrev         = 0;
+/** Stack of previous sorter states for undo(). */
+let undoStack = [];
 
 /** Miscellaneous sorter data that doesn't need to be saved for undo(). */
 let finalCharacters = [];
-let loading         = false;
-let totalBattles    = 0;
-let sorterURL       = window.location.host + window.location.pathname;
-let storedSaveType  = localStorage.getItem(`${sorterURL}_saveType`);
+let loading = false;
+let totalBattles = 0;
+let sorterURL = window.location.host + window.location.pathname;
+let storedSaveType = localStorage.getItem(`${sorterURL}_saveType`);
+
+const completionCounterNamespace = 'kpopggsorter';
+const completionCounterKey = 'sortersCompleted';
 
 /** Initialize script. */
 function init() {
 
   /** Define button behavior. */
-  document.querySelector('.starting.start.button').addEventListener('click', prelimStart);
+  document.querySelector('.starting.start.button').addEventListener('click', start);
   document.querySelector('.starting.load.button').addEventListener('click', loadProgress);
 
   document.querySelector('.left.sort.image').addEventListener('click', () => pick('left'));
   document.querySelector('.right.sort.image').addEventListener('click', () => pick('right'));
-  
-  document.querySelector('.prelim.keep.button').addEventListener('click', () => prelimPick('keep'));
-  document.querySelector('.prelim.ignore.button').addEventListener('click', () => prelimPick('ignore'));
-  document.querySelector('.prelim.keep-group.button').addEventListener('click', () => prelimPick('keep-group'));
-  document.querySelector('.prelim.ignore-group.button').addEventListener('click', () => prelimPick('ignore-group'));
-  document.querySelector('.prelim.undo.button').addEventListener('click', prelimUndo);
 
   document.querySelector('.sorting.tie.button').addEventListener('click', () => pick('tie'));
   document.querySelector('.sorting.undo.button').addEventListener('click', undo);
   document.querySelector('.sorting.save.button').addEventListener('click', () => saveProgress('Progress'));
+  // document.querySelector('.sorting.result.button').addEventListener('click', () => result());
 
   document.querySelector('.finished.save.button').addEventListener('click', () => saveProgress('Last Result'));
   document.querySelector('.finished.getimg.button').addEventListener('click', generateImage);
@@ -84,39 +72,30 @@ function init() {
   document.querySelector('#new-results').style.display = 'none';
 
   /** Define keyboard controls (up/down/left/right vimlike k/j/h/l). */
-  document.addEventListener('keypress', (ev) => {
-    /** If preliminary is in progress. */
-	if (prelim) {
-		switch(ev.key) {
-        case 'h': case 'ArrowLeft':           pickPrelim('keep'); break;
-        case 'l': case 'ArrowRight':          pickPrelim('ignore'); break;
-        case 'j': case '2': case 'ArrowDown': undo(); break;
-        default: break;
-      }
-	}
-	/** If sorting is in progress. */
-    else if (timestamp && !timeTaken && !loading && choices.length === battleNo - 1) {
-      switch(ev.key) {
-        case 's': case '3':                   saveProgress('Progress'); break;
-        case 'h': case 'ArrowLeft':           pick('left'); break;
-        case 'l': case 'ArrowRight':          pick('right'); break;
-        case 'k': case '1': case 'ArrowUp':   pick('tie'); break;
+  document.addEventListener('keydown', (ev) => {
+    /** If sorting is in progress. */
+    if (timestamp && !timeTaken && !loading && choices.length === battleNo - 1) {
+      switch (ev.key) {
+        case 's': case '3': saveProgress('Progress'); break;
+        case 'h': case 'ArrowLeft': pick('left'); break;
+        case 'l': case 'ArrowRight': pick('right'); break;
+        case 'k': case '1': case 'ArrowUp': pick('tie'); break;
         case 'j': case '2': case 'ArrowDown': undo(); break;
         default: break;
       }
     }
     /** If sorting has ended. */
     else if (timeTaken && choices.length === battleNo - 1) {
-      switch(ev.key) {
+      switch (ev.key) {
         case 'k': case '1': saveProgress('Last Result'); break;
         case 'j': case '2': generateImage(); break;
         case 's': case '3': generateTextList(); break;
         default: break;
       }
     } else { // If sorting hasn't started yet.
-      switch(ev.key) {
-        case '1': case 's': case 'Enter': prelimStart(); break;
-        case '2': case 'l':               loadProgress(); break;
+      switch (ev.key) {
+        case '1': case 's': case 'Enter': start(); break;
+        case '2': case 'l': loadProgress(); break;
         default: break;
       }
     }
@@ -153,8 +132,9 @@ function init() {
   if (window.location.search.slice(1) !== '') decodeQuery();
 }
 
-/** Begin preliminary round. */
-function prelimStart() {
+/** Begin sorting. */
+function start() {
+  undoStack = [];
   /** Copy data into sorting array to filter. */
   characterDataToSort = characterData.slice(0);
 
@@ -175,8 +155,9 @@ function prelimStart() {
   });
 
   /** Convert boolean array form to string form. */
-  optStr    = '';
+  optStr = '';
   suboptStr = '';
+  memberStr = '';
 
   optStr = optTaken
     .map(val => !!val)
@@ -194,7 +175,22 @@ function prelimStart() {
     }
   });
 
+  const groupOpt = options.find(opt => opt.key === 'group');
+  if (groupOpt) {
+    groupOpt.sub.forEach((subopt, subindex) => {
+      memberStr += '|';
+      const memChecks = document.querySelectorAll(`#member-${subindex} input[type=checkbox]`);
+      memChecks.forEach(cb => {
+        memberStr += cb.checked ? '1' : '0';
+      });
+    });
+  }
+
   /** Filter out deselected nested criteria and remove selected criteria. */
+  const getCharOpt = (char, key) => {
+    if (char.opts && char.opts[key]) return char.opts[key];
+    return char[key];
+  };
   options.forEach((opt, index) => {
     if ('sub' in opt) {
       if (optTaken[index]) {
@@ -203,42 +199,34 @@ function prelimStart() {
           return subList;
         }, []);
         characterDataToSort = characterDataToSort.filter(char => {
-          if (!(opt.key in char.opts)) console.warn(`Warning: ${opt.key} not set for ${char.name}.`);
-          return opt.key in char.opts && char.opts[opt.key].some(key => subArray.includes(key));
+          const val = getCharOpt(char, opt.key);
+          if (!val) console.warn(`Warning: ${opt.key} not set for ${char.name}.`);
+          return val && val.some(key => subArray.includes(key));
         });
       }
     } else if (optTaken[index]) {
-      characterDataToSort = characterDataToSort.filter(char => !char.opts[opt.key]);
+      characterDataToSort = characterDataToSort.filter(char => !getCharOpt(char, opt.key));
     }
   });
 
-  if (characterDataToSort.length < 2) {
-    alert('Cannot sort with less than two characters. Please reselect.');
-    return;
+  /** Further filter by selected members within each group. */
+  const groupOptIndex = options.findIndex(o => o.key === 'group');
+  if (groupOptIndex !== -1 && Array.isArray(optTaken[groupOptIndex])) {
+    const groupOpt = options[groupOptIndex];
+    groupOpt.sub.forEach((subopt, subindex) => {
+      if (optTaken[groupOptIndex][subindex]) {
+        const memChecks = document.querySelectorAll(`#member-${subindex} input[type=checkbox]`);
+        const allowed = Array.from(memChecks).filter(cb => cb.checked).map(cb => cb.dataset.member);
+        characterDataToSort = characterDataToSort.filter(char => {
+          const groups = getCharOpt(char, 'group');
+          if (!(groups && groups.includes(subopt.key))) return true;
+          const nm = char.name.replace(/\s*\(.*\)$/, '');
+          return allowed.includes(nm);
+        });
+      }
+    });
   }
 
-  /** Disable all checkboxes and hide/show appropriate parts while we preload the images. */
-  document.querySelectorAll('input[type=checkbox]').forEach(cb => cb.disabled = true);
-  document.querySelectorAll('.starting.button').forEach(el => el.style.display = 'none');
-  document.querySelector('.loading.button').style.display = 'block';
-  document.querySelector('.progress-section').style.display = 'block';
-  loading = true;
-
-  preloadImages().then(() => {
-    loading = false;
-	prelim = true;
-    document.querySelector('.loading.button').style.display = 'none';
-	document.querySelector('.sorter.game').style.display = 'none';
-	document.querySelector('.sorter.prelim').style.display = 'flex';
-    displayPrelim();
-  });
-}
-
-/** Begin sorting. */
-function start() {
-  prelim = false;
-  prelimIgnoreList.sort((a,b) => a-b).reverse().forEach((x) => characterDataToSort.splice(x, 1));
-  
   if (characterDataToSort.length < 2) {
     alert('Cannot sort with less than two characters. Please reselect.');
     return;
@@ -251,7 +239,7 @@ function start() {
 
   characterDataToSort = characterDataToSort
     .map(a => [Math.random(), a])
-    .sort((a,b) => a[0] - b[0])
+    .sort((a, b) => a[0] - b[0])
     .map(a => a[1]);
 
   /**
@@ -260,8 +248,8 @@ function start() {
    * the mergesort process.
    */
 
-  recordDataList  = characterDataToSort.map(() => 0);
-  tiedDataList    = characterDataToSort.map(() => -1);
+  recordDataList = characterDataToSort.map(() => 0);
+  tiedDataList = characterDataToSort.map(() => -1);
 
   /**
    * Put a list of indexes that we'll be sorting into sortedIndexList. These will refer back
@@ -278,7 +266,7 @@ function start() {
   parentIndexList[0] = -1;
 
   let midpoint = 0;   // Indicates where to split the array.
-  let marker   = 1;   // Indicates where to place our newly split array.
+  let marker = 1;   // Indicates where to place our newly split array.
 
   for (let i = 0; i < sortedIndexList.length; i++) {
     if (sortedIndexList[i].length > 1) {
@@ -297,58 +285,48 @@ function start() {
     }
   }
 
-  leftIndex  = sortedIndexList.length - 2;    // Start with the second last value and...
+  leftIndex = sortedIndexList.length - 2;    // Start with the second last value and...
   rightIndex = sortedIndexList.length - 1;    // the last value in the sorted list and work our way down to index 0.
 
-  leftInnerIndex  = 0;                        // Inner indexes, because we'll be comparing the left array
+  leftInnerIndex = 0;                        // Inner indexes, because we'll be comparing the left array
   rightInnerIndex = 0;                        // to the right array, in order to merge them into one sorted array.
-  
-  document.querySelector('.sorter.game').style.display = 'flex';
-  document.querySelector('.sorter.prelim').style.display = 'none';
-	
-  document.querySelectorAll('.sorting.button').forEach(el => el.style.display = 'block');
-  document.querySelectorAll('.sort.text').forEach(el => el.style.display = 'block');
-  display();
-}
 
-/** Displays the current state of the preliminary sorter. */
-function displayPrelim() {
-  if (prelimIndex === characterDataToSort.length) {
-    start();
-	return;
-  }
-	
-  const percent   = Math.floor(prelimIndex * 100 / characterDataToSort.length);
-  const character = characterDataToSort[prelimIndex]; 
-    
-  const charNameDisp = name => {
-    const charName = reduceTextWidth(name, 'Arial 12.8px', 220);
-    const charTooltip = name !== charName ? name : '';
-    return `<p title="${charTooltip}">${charName}</p>`;
-  };
+  /** Disable all checkboxes and hide/show appropriate parts while we preload the images. */
+  document.querySelectorAll('input[type=checkbox]').forEach(cb => cb.disabled = true);
+  document.querySelectorAll('.starting.button').forEach(el => el.style.display = 'none');
+  document.querySelector('.loading.button').style.display = 'block';
+  document.querySelector('.progress-section').style.display = 'block';
+  loading = true;
 
-  progressBar(`Preliminary No. ${prelimIndex + 1}`, percent);
-
-  document.querySelector('.prelim.sort.image').src = character.img;
-
-  document.querySelector('.prelim.sort.text').innerHTML = charNameDisp(character.name);
-  
-  saveProgress('Autosave');
+  preloadImages().then(() => {
+    loading = false;
+    document.querySelector('.loading.button').style.display = 'none';
+    document.querySelectorAll('.sorting.button').forEach(el => el.style.display = 'block');
+    document.querySelectorAll('.sort.text').forEach(el => el.style.display = 'block');
+    display();
+  });
 }
 
 /** Displays the current state of the sorter. */
 function display() {
-  const percent         = Math.floor(sortedNo * 100 / totalBattles);
-  const leftCharIndex   = sortedIndexList[leftIndex][leftInnerIndex];
-  const rightCharIndex  = sortedIndexList[rightIndex][rightInnerIndex];
-  const leftChar        = characterDataToSort[leftCharIndex];
-  const rightChar       = characterDataToSort[rightCharIndex];
-  
+  const percent = Math.floor(sortedNo * 100 / totalBattles);
+  const leftCharIndex = sortedIndexList[leftIndex][leftInnerIndex];
+  const rightCharIndex = sortedIndexList[rightIndex][rightInnerIndex];
+  const leftChar = characterDataToSort[leftCharIndex];
+  const rightChar = characterDataToSort[rightCharIndex];
+
   const charNameDisp = name => {
     const charName = reduceTextWidth(name, 'Arial 12.8px', 220);
     const charTooltip = name !== charName ? name : '';
     return `<p title="${charTooltip}">${charName}</p>`;
   };
+
+  const progressText = document.querySelector('.progresstext');
+  if (percent >= 50) {
+    progressText.style.color = 'black';
+  } else {
+    progressText.style.color = 'white';
+  }
 
   progressBar(`Battle No. ${battleNo}`, percent);
 
@@ -371,32 +349,22 @@ function display() {
   } else { saveProgress('Autosave'); }
 }
 
-/**
- * Sort between two character choices or tie.
- *
- * @param {'keep'|'ignore'} prelimPickType
- */
-function prelimPick(prelimPickType) {
-	const group = characterDataToSort[prelimIndex].opts.group[0];
-	
-	if (prelimPickType === 'ignore' || prelimPickType === 'ignore-group') {
-		prelimIgnoreList.push(prelimIndex);
-	}
-	
-	prelimIndex++;
-	
-	if (prelimIndex < characterDataToSort.length && characterDataToSort[prelimIndex].opts.group[0] === group) {
-		if (prelimPickType === 'ignore-group') {
-			prelimPick('ignore-group');
-			return;
-		}
-		else if (prelimPickType === 'keep-group') {
-			prelimPick('keep-group');
-			return;
-		}
-	}
-	
-	displayPrelim();
+/** Save the current sorter state for undo purposes. */
+function pushUndoState() {
+  undoStack.push({
+    choices,
+    sortedIndexList: sortedIndexList.map(arr => arr.slice()),
+    recordDataList: recordDataList.slice(0),
+    parentIndexList: parentIndexList.slice(0),
+    tiedDataList: tiedDataList.slice(0),
+    leftIndex,
+    leftInnerIndex,
+    rightIndex,
+    rightInnerIndex,
+    battleNo,
+    sortedNo,
+    pointer
+  });
 }
 
 /**
@@ -408,18 +376,7 @@ function pick(sortType) {
   if ((timeTaken && choices.length === battleNo - 1) || loading) { return; }
   else if (!timestamp) { return start(); }
 
-  sortedIndexListPrev = sortedIndexList.slice(0);
-  recordDataListPrev  = recordDataList.slice(0);
-  parentIndexListPrev = parentIndexList.slice(0);
-  tiedDataListPrev    = tiedDataList.slice(0);
-
-  leftIndexPrev       = leftIndex;
-  leftInnerIndexPrev  = leftInnerIndex;
-  rightIndexPrev      = rightIndex;
-  rightInnerIndexPrev = rightInnerIndex;
-  battleNoPrev        = battleNo;
-  sortedNoPrev        = sortedNo;
-  pointerPrev         = pointer;
+  pushUndoState();
 
   /**
    * For picking 'left' or 'right':
@@ -440,19 +397,19 @@ function pick(sortType) {
     case 'right': {
       if (choices.length === battleNo - 1) { choices += '1'; }
       recordData('right');
-      while (tiedDataList[recordDataList [pointer - 1]] != -1) {
+      while (tiedDataList[recordDataList[pointer - 1]] != -1) {
         recordData('right');
       }
       break;
     }
 
-  /**
-   * For picking 'tie' (i.e. heretics):
-   *
-   * Proceed as if we picked the 'left' character. Then, we record the right character's
-   * index value into the list of ties (at the left character's index) and then proceed
-   * as if we picked the 'right' character.
-   */
+    /**
+     * For picking 'tie' (i.e. heretics):
+     *
+     * Proceed as if we picked the 'left' character. Then, we record the right character's
+     * index value into the list of ties (at the left character's index) and then proceed
+     * as if we picked the 'right' character.
+     */
     case 'tie': {
       if (choices.length === battleNo - 1) { choices += '2'; }
       recordData('left');
@@ -461,7 +418,7 @@ function pick(sortType) {
       }
       tiedDataList[recordDataList[pointer - 1]] = sortedIndexList[rightIndex][rightInnerIndex];
       recordData('right');
-      while (tiedDataList[recordDataList [pointer - 1]] != -1) {
+      while (tiedDataList[recordDataList[pointer - 1]] != -1) {
         recordData('right');
       }
       break;
@@ -513,12 +470,20 @@ function pick(sortType) {
    * array in index 0 is now replaced with a sorted version, and we will now output this.
    */
   if (leftIndex < 0) {
+
     timeTaken = timeTaken || new Date().getTime() - timestamp;
+
+
 
     progressBar(`Battle No. ${battleNo} - Completed!`, 100);
 
+
+
+    submitResult();
     result();
+
   } else {
+
     battleNo++;
     display();
   }
@@ -620,7 +585,7 @@ function progressBar(indicator, percentage) {
  * @param {number} [imageNum=3] Number of images to display. Defaults to 3.
  */
 function result(imageNum = 3) {
-    document.querySelector('#new-results').style.display = 'block';
+  document.querySelector('#new-results').style.display = 'block';
   document.querySelectorAll('.finished.button').forEach(el => el.style.display = 'block');
   document.querySelector('.image.selector').style.display = 'block';
   document.querySelector('.time.taken').style.display = 'block';
@@ -628,8 +593,8 @@ function result(imageNum = 3) {
 
   document.querySelectorAll('.sorting.button').forEach(el => el.style.display = 'none');
   document.querySelectorAll('.sort.text').forEach(el => el.style.display = 'none');
-    document.querySelector('.progress-section').style.display = 'none';
-    document.querySelector('.sorter.game').style.display = 'none';
+  document.querySelector('.progress-section').style.display = 'none';
+  document.querySelector('.sorter').style.display = 'none';
   document.querySelector('.options').style.display = 'none';
   // document.querySelector('.info').style.display = 'none';
 
@@ -646,13 +611,13 @@ function result(imageNum = 3) {
     return `<div class="result"><div class="left">${num}</div><div class="right"><span title="${charTooltip}">${charName}</span></div></div>`;
   }
 
-  let rankNum       = 1;
-  let tiedRankNum   = 1;
-  let imageDisplay  = imageNum;
+  let rankNum = 1;
+  let tiedRankNum = 1;
+  let imageDisplay = imageNum;
 
   const finalSortedIndexes = sortedIndexList[0].slice(0);
   const resultBigTable = document.querySelector('.results');
-    const resultTable = document.querySelector('.results-table');
+  const resultTable = document.querySelector('.results-table');
   const timeElem = document.querySelector('.time.taken');
 
   resultTable.innerHTML = '';
@@ -663,7 +628,7 @@ function result(imageNum = 3) {
     const characterIndex = finalSortedIndexes[idx];
     const character = characterDataToSort[characterIndex];
     if (imageDisplay-- > 0) {
-        resultBigTable.insertAdjacentHTML('beforeend', imgRes(character, rankNum));
+      resultBigTable.insertAdjacentHTML('beforeend', imgRes(character, rankNum));
     } else {
       resultTable.insertAdjacentHTML('beforeend', res(character, rankNum));
     }
@@ -680,38 +645,25 @@ function result(imageNum = 3) {
   });
 }
 
-/** Undo previous choice in prelim. */
-function prelimUndo() {
-  if (prelimIndex <= 0) {
-	  return;
-  }	
-	
-  prelimIndex--;
-  if (prelimIgnoreList.length > 0 && prelimIgnoreList[prelimIgnoreList.length - 1] === prelimIndex) {
-	  prelimIgnoreList.pop();
-  }
-
-  displayPrelim();
-}
-
 /** Undo previous choice. */
 function undo() {
-  if (timeTaken) { return; }
+  if (timeTaken || undoStack.length === 0) { return; }
 
-  choices = battleNo === battleNoPrev ? choices : choices.slice(0, -1);
+  const prev = undoStack.pop();
 
-  sortedIndexList = sortedIndexListPrev.slice(0);
-  recordDataList  = recordDataListPrev.slice(0);
-  parentIndexList = parentIndexListPrev.slice(0);
-  tiedDataList    = tiedDataListPrev.slice(0);
+  choices = prev.choices;
+  sortedIndexList = prev.sortedIndexList.map(arr => arr.slice());
+  recordDataList = prev.recordDataList.slice(0);
+  parentIndexList = prev.parentIndexList.slice(0);
+  tiedDataList = prev.tiedDataList.slice(0);
 
-  leftIndex       = leftIndexPrev;
-  leftInnerIndex  = leftInnerIndexPrev;
-  rightIndex      = rightIndexPrev;
-  rightInnerIndex = rightInnerIndexPrev;
-  battleNo        = battleNoPrev;
-  sortedNo        = sortedNoPrev;
-  pointer         = pointerPrev;
+  leftIndex = prev.leftIndex;
+  leftInnerIndex = prev.leftInnerIndex;
+  rightIndex = prev.rightIndex;
+  rightInnerIndex = prev.rightInnerIndex;
+  battleNo = prev.battleNo;
+  sortedNo = prev.sortedNo;
+  pointer = prev.pointer;
 
   display();
 }
@@ -727,12 +679,39 @@ function saveProgress(saveType) {
   localStorage.setItem(`${sorterURL}_saveData`, saveData);
   localStorage.setItem(`${sorterURL}_saveType`, saveType);
 
-  if (saveType !== 'Autosave') {
-    const saveURL = `${location.protocol}//${sorterURL}?${saveData}`;
-    const inProgressText = 'You may click Load Progress after this to resume, or use this URL.';
-    const finishedText = 'You may use this URL to share this result, or click Load Last Result to view it again.';
+  if (saveType === 'Autosave') {
+    return;
+  }
 
-    window.prompt(saveType === 'Last Result' ? finishedText : inProgressText, saveURL);
+  const saveURL = `${location.protocol}//${sorterURL}?${saveData}`;
+  const inProgressText = 'You may click Load Progress after this to resume, or use this URL.';
+  const finishedText = 'You may use this URL to share this result, or click Load Last Result to view it again.';
+
+  window.prompt(saveType === 'Last Result' ? finishedText : inProgressText, saveURL);
+}
+
+async function submitResult() {
+  const saveData = generateSavedata();
+  const savedURL = `${location.protocol}//${sorterURL}?${saveData}`;
+
+  try {
+    const response = await fetch(
+      `${location.protocol}//${sorterURL}save`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+        body: savedURL,
+      }
+    );
+
+    if (!response.ok) {
+      const responseText = await response.text();
+      console.error(`Error saving sorter result: ${responseText}`);
+    }
+  } catch (error) {
+    console.error(`Error saving sorter result: ${error}`);
   }
 }
 
@@ -792,9 +771,24 @@ function generateTextList() {
 }
 
 function generateSavedata() {
-  const prelimIgnoreListString = prelimIgnoreList.join();
-  const saveData = `${timeError?'|':''}${timestamp}|${timeTaken}|${choices}|${prelimIndex}|${prelimIgnoreListString}|${optStr}${suboptStr}`;
+  const saveData = `${timeError ? '|' : ''}${timestamp}|${timeTaken}|${choices}|${optStr}${suboptStr}${memberStr}`;
   return LZString.compressToEncodedURIComponent(saveData);
+}
+
+/** Build map of group keys to member name arrays from character data. */
+function buildMemberMap() {
+  memberMap = {};
+  const groupOpt = options.find(opt => opt.key === 'group');
+  if (!groupOpt) return;
+  groupOpt.sub.forEach(sub => {
+    const members = characterData
+      .filter(c => {
+        const groups = c.group || (c.opts && c.opts.group);
+        return groups && groups.includes(sub.key);
+      })
+      .map(c => c.name.replace(/\s*\(.*\)$/, ''));
+    memberMap[sub.key] = Array.from(new Set(members)).sort((a, b) => a.localeCompare(b));;
+  });
 }
 
 /** Retrieve latest character data and options from dataset. */
@@ -802,7 +796,7 @@ function setLatestDataset() {
   /** Set some defaults. */
   timestamp = 0;
   timeTaken = 0;
-  choices   = '';
+  choices = '';
 
   const latestDateIndex = Object.keys(dataSet)
     .map(date => new Date(date))
@@ -813,27 +807,33 @@ function setLatestDataset() {
 
   characterData = dataSet[currentVersion].characterData;
   options = dataSet[currentVersion].options;
-
+  buildMemberMap();
   populateOptions();
 }
 
 /** Populate option list. */
 function populateOptions() {
   const optList = document.querySelector('.options');
-  const optInsert = (name, id, tooltip, checked = true, disabled = false) => {
-    return `<div><label title="${tooltip?tooltip:name}"><input id="cb-${id}" type="checkbox" ${checked?'checked':''} ${disabled?'disabled':''}> ${name}</label></div>`;
+  const optInsert = (name, id, tooltip, checked = false, disabled = false) => {
+    return `<div><label title="${tooltip ? tooltip : name}"><input id="cb-${id}" type="checkbox" ${checked ? 'checked' : ''} ${disabled ? 'disabled' : ''}> ${name}</label></div>`;
   };
   const optInsertLarge = (name, id, tooltip, checked = true) => {
-    return `<div class="large option"><label title="${tooltip?tooltip:name}"><input id="cbgroup-${id}" type="checkbox" ${checked?'checked':''}> ${name}</label></div>`;
+    return `<div class="large option"><label title="${tooltip ? tooltip : name}"><input id="cbgroup-${id}" type="checkbox" ${checked ? 'checked' : ''}> ${name}</label></div>`;
   };
+  const checkUncheck = () => {
+    return `<div class="button-container"><button id="check-all">Check All</button><button id="uncheck-all">Uncheck All</button></div>`
+  }
 
   /** Clear out any previous options. */
   optList.innerHTML = '';
 
   /** Insert sorter options and set grouped option behavior. */
-  options.forEach(opt => {
+  options.forEach((opt, index) => {
     if ('sub' in opt) {
       optList.insertAdjacentHTML('beforeend', optInsertLarge(opt.name, opt.key, opt.tooltip, opt.checked));
+      if (index === 0) {
+        optList.insertAdjacentHTML('beforeend', checkUncheck());
+      }
       opt.sub.forEach((subopt, subindex) => {
         optList.insertAdjacentHTML('beforeend', optInsert(subopt.name, `${opt.key}-${subindex}`, subopt.tooltip, subopt.checked, opt.checked === false));
       });
@@ -844,13 +844,96 @@ function populateOptions() {
         opt.sub.forEach((subopt, subindex) => {
           document.getElementById(`cb-${opt.key}-${subindex}`).disabled = !groupbox.checked;
           if (groupbox.checked) { document.getElementById(`cb-${opt.key}-${subindex}`).checked = true; }
+          const memContainer = document.getElementById(`member-${subindex}`);
+          if (memContainer) {
+            memContainer.style.display = groupbox.checked && document.getElementById(`cb-${opt.key}-${subindex}`).checked ? 'block' : 'none';
+            memContainer.querySelectorAll('input').forEach(inp => {
+              inp.disabled = !groupbox.checked;
+              if (groupbox.checked) inp.checked = true;
+            });
+          }
         });
       });
     } else {
       optList.insertAdjacentHTML('beforeend', optInsert(opt.name, opt.key, opt.tooltip, opt.checked));
     }
   });
+
+  insertMemberOptions();
+
+  document.getElementById('check-all').addEventListener('click', () => {
+    document.querySelectorAll('.options input[type=checkbox]').forEach(checkbox => {
+      if (!checkbox.id.startsWith('cbgroup-group') && !checkbox.id.startsWith('cbgroup-gen')) {
+        checkbox.checked = true;
+      }
+    });
+    document.querySelectorAll('.member-options').forEach(cont => {
+      cont.style.display = 'block';
+      cont.querySelectorAll('input').forEach(inp => {
+        inp.disabled = false;
+        inp.checked = true;
+      });
+    });
+  });
+  document.getElementById('uncheck-all').addEventListener('click', () => {
+    document.querySelectorAll('.options input[type=checkbox]').forEach(checkbox => {
+      if (!checkbox.id.startsWith('cbgroup-group') && !checkbox.id.startsWith('cbgroup-gen') && !checkbox.id.startsWith('cb-gen')) {
+        checkbox.checked = false;
+      }
+    });
+    document.querySelectorAll('.member-options').forEach(cont => {
+      cont.style.display = 'none';
+      cont.querySelectorAll('input').forEach(inp => inp.disabled = true);
+    });
+  });
 }
+
+/** Insert member checkboxes for each selected group. */
+function insertMemberOptions() {
+  const groupOpt = options.find(opt => opt.key === 'group');
+  if (!groupOpt) return;
+  groupOpt.sub.forEach((subopt, subindex) => {
+    const subcb = document.getElementById(`cb-${groupOpt.key}-${subindex}`);
+    if (!subcb) return;
+    const container = document.createElement('div');
+    container.className = 'member-options';
+    container.id = `member-${subindex}`;
+    container.style.marginLeft = '2em';
+    (memberMap[subopt.key] || []).forEach(member => {
+      const memId = `cb-${subopt.key}-m-${member.replace(/[^a-zA-Z0-9]/g, '')}`;
+      container.insertAdjacentHTML(
+        'beforeend',
+        `<div><label><input id="${memId}" data-group="${subopt.key}" data-member="${member}" type="checkbox" checked> ${member}</label></div>`
+      );
+    });
+    subcb.parentElement.insertAdjacentElement('afterend', container);
+    container.style.display = subcb.checked && document.getElementById(`cbgroup-${groupOpt.key}`).checked ? 'block' : 'none';
+    container.querySelectorAll('input').forEach(inp => {
+      inp.disabled = !(subcb.checked && document.getElementById(`cbgroup-${groupOpt.key}`).checked);
+    });
+    subcb.addEventListener('change', () => {
+      container.style.display = subcb.checked ? 'block' : 'none';
+      container.querySelectorAll('input').forEach(inp => {
+        inp.disabled = !subcb.checked;
+        if (subcb.checked) inp.checked = true;
+      });
+    });
+    container.querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('change', () => {
+        if (inp.checked) {
+          const groupbox = document.getElementById(`cbgroup-${groupOpt.key}`);
+          if (groupbox && !groupbox.checked) groupbox.checked = true;
+          if (!subcb.checked) {
+            subcb.checked = true;
+            container.style.display = 'block';
+            container.querySelectorAll('input').forEach(i => i.disabled = false);
+          }
+        }
+      });
+    });
+  });
+}
+
 
 /**
  * Decodes compressed shareable link query string.
@@ -872,13 +955,10 @@ function decodeQuery(queryString = window.location.search.slice(1)) {
 
     timestamp = Number(decoded.splice(0, 1)[0]);
     timeTaken = Number(decoded.splice(0, 1)[0]);
-    choices   = decoded.splice(0, 1)[0];
+    choices = decoded.splice(0, 1)[0];
 
-	const prelimIndexDecoded = decoded.splice(0, 1)[0];
-	const prelimIgnoreListStringDecoded = decoded.splice(0, 1)[0];
-
-    const optDecoded    = decoded.splice(0, 1)[0];
-    const suboptDecoded = decoded.slice(0);
+    const optDecoded = decoded.splice(0, 1)[0];
+    const restDecoded = decoded.slice(0);
 
     /**
      * Get latest data set version from before the timestamp.
@@ -908,24 +988,62 @@ function decodeQuery(queryString = window.location.search.slice(1)) {
     characterData = dataSet[currentVersion].characterData;
 
     /** Populate option list and decode options selected. */
+    buildMemberMap();
     populateOptions();
+
+    let restIndex = 0;
+    const suboptDecoded = [];
+    options.forEach((opt, idx) => {
+      if ('sub' in opt && optDecoded[idx] === '1') {
+        suboptDecoded.push(restDecoded[restIndex++] || '');
+      }
+    });
+    const memberDecoded = [];
+    const groupOpt = options.find(opt => opt.key === 'group');
+    if (groupOpt) {
+      groupOpt.sub.forEach(() => {
+        memberDecoded.push(restDecoded[restIndex++] || '');
+      });
+    }
 
     let suboptDecodedIndex = 0;
     options.forEach((opt, index) => {
       if ('sub' in opt) {
         const optIsTrue = optDecoded[index] === '1';
+        const subData = optIsTrue ? suboptDecoded[suboptDecodedIndex] || '' : '';
         document.getElementById(`cbgroup-${opt.key}`).checked = optIsTrue;
         opt.sub.forEach((subopt, subindex) => {
-          const subIsTrue = optIsTrue ? suboptDecoded[suboptDecodedIndex][subindex] === '1' : true;
+          const subIsTrue = optIsTrue ? subData[subindex] === '1' : true;
           document.getElementById(`cb-${opt.key}-${subindex}`).checked = subIsTrue;
-          document.getElementById(`cb-${opt.key}-${subindex}`).disabled = optIsTrue;
+          document.getElementById(`cb-${opt.key}-${subindex}`).disabled = !optIsTrue;
         });
-        suboptDecodedIndex = suboptDecodedIndex + optIsTrue ? 1 : 0;
-      } else { document.getElementById(`cb-${opt.key}`).checked = optDecoded[index] === '1'; }
+        if (optIsTrue) suboptDecodedIndex++;
+      } else {
+        document.getElementById(`cb-${opt.key}`).checked = optDecoded[index] === '1';
+      }
     });
-	
-    prelimIndex = Number(prelimIndexDecoded);
-    prelimIgnoreList = prelimIgnoreListStringDecoded.split(',').map(Number);;
+
+    if (groupOpt) {
+      let memberIndex = 0;
+      groupOpt.sub.forEach((subopt, subindex) => {
+        const memData = memberDecoded[memberIndex++] || '';
+        const memChecks = document.querySelectorAll(`#member-${subindex} input[type=checkbox]`);
+        memChecks.forEach((cb, cbindex) => {
+          cb.checked = memData[cbindex] !== '0';
+        });
+      });
+      const groupbox = document.getElementById(`cbgroup-${groupOpt.key}`);
+      groupOpt.sub.forEach((subopt, subindex) => {
+        const subcb = document.getElementById(`cb-${groupOpt.key}-${subindex}`);
+        const memContainer = document.getElementById(`member-${subindex}`);
+        if (memContainer) {
+          memContainer.style.display = groupbox.checked && subcb.checked ? 'block' : 'none';
+          memContainer.querySelectorAll('input').forEach(inp => {
+            inp.disabled = !(groupbox.checked && subcb.checked);
+          });
+        }
+      });
+    }
 
     successfulLoad = true;
   } catch (err) {
@@ -933,7 +1051,7 @@ function decodeQuery(queryString = window.location.search.slice(1)) {
     setLatestDataset(); // Restore to default function if loading link does not work.
   }
 
-  if (successfulLoad) { prelimStart(); }
+  if (successfulLoad) { start(); }
 }
 
 /**
@@ -944,20 +1062,26 @@ function preloadImages() {
   let imagesLoaded = 0;
 
   const loadImage = (src, idx) => {
-      return new Promise((resolve, reject) => {
-          const img = new Image();
+    return new Promise((resolve, reject) => {
+      const img = new Image();
 
-          img.crossOrigin = 'Anonymous';
-          img.onload = () => {
-            setImageToData(img, idx);
-            resolve(img);
-          };
-          img.onerror = img.onabort = () => reject(src);
-          if ( img.complete || img.complete === undefined ) {
-            img.src = src;
-          }
-          img.src = src;
-      });
+      img.crossOrigin = 'Anonymous';
+      img.onload = () => {
+        setImageToData(img, idx);
+        resolve(img);
+      };
+
+      img.onerror = img.onabort = () => reject(src);
+      // img.onerror = img.onabort = () => {
+      //   console.warn(`Failed to load image: ${src}`);
+      //   resolve();
+      // };
+
+      if (img.complete || img.complete === undefined) {
+        img.src = src;
+      }
+      img.src = src;
+    });
   };
 
   const setImageToData = (img, idx) => {
@@ -969,7 +1093,7 @@ function preloadImages() {
     progressBar(`Loading Image ${++imagesLoaded}`, Math.floor(imagesLoaded * 100 / totalLength));
   };
 
-  const promises = characterDataToSort.map((char, idx) => loadImage(imageRoot + char.img, idx));
+  const promises = characterDataToSort.map((char, idx) => loadImage(char.img, idx));
   return Promise.all(promises);
 }
 
@@ -978,8 +1102,8 @@ function preloadImages() {
  *
  * @param {number} milliseconds
  */
-function msToReadableTime (milliseconds) {
-  let t = Math.floor(milliseconds/1000);
+function msToReadableTime(milliseconds) {
+  let t = Math.floor(milliseconds / 1000);
   const years = Math.floor(t / 31536000);
   t = t - (years * 31536000);
   const months = Math.floor(t / 2592000);
@@ -991,13 +1115,13 @@ function msToReadableTime (milliseconds) {
   const minutes = Math.floor(t / 60);
   t = t - (minutes * 60);
   const content = [];
-	if (years) content.push(years + " year" + (years > 1 ? "s" : ""));
-	if (months) content.push(months + " month" + (months > 1 ? "s" : ""));
-	if (days) content.push(days + " day" + (days > 1 ? "s" : ""));
-	if (hours) content.push(hours + " hour"  + (hours > 1 ? "s" : ""));
-	if (minutes) content.push(minutes + " minute" + (minutes > 1 ? "s" : ""));
-	if (t) content.push(t + " second" + (t > 1 ? "s" : ""));
-  return content.slice(0,3).join(', ');
+  if (years) content.push(years + " year" + (years > 1 ? "s" : ""));
+  if (months) content.push(months + " month" + (months > 1 ? "s" : ""));
+  if (days) content.push(days + " day" + (days > 1 ? "s" : ""));
+  if (hours) content.push(hours + " hour" + (hours > 1 ? "s" : ""));
+  if (minutes) content.push(minutes + " minute" + (minutes > 1 ? "s" : ""));
+  if (t) content.push(t + " second" + (t > 1 ? "s" : ""));
+  return content.slice(0, 3).join(', ');
 }
 
 /**
